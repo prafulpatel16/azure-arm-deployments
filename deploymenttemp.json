@@ -3,11 +3,11 @@
     "contentVersion": "1.0.0.0",
     "resources": [
        {
-           "name": "prafulStorage1",
+           "name": "prpstorage1",
            "type": "Microsoft.Storage/storageAccounts",
            "apiVersion": "2021-04-01",
            "tags": {
-               "displayName": "prafulStorage1"
+               "displayName": "prpstorage1"
            },
            "location": "[resourceGroup().location]",
            "kind": "StorageV2",
