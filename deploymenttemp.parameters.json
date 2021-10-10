@@ -7,10 +7,13 @@
         },
 
         "storageSKU": {
-            "value": "Standard_GRS" 
+            "value": "Standard_LRS"        
+        },
 
+        "location": {
+            "value": "eastus" 
+        }
     }
-}
 }
 
 
