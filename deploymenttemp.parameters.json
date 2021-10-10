@@ -4,6 +4,15 @@
     "parameters": {
         "storageAccountName": {
             "value": "prafulstorage2021" 
-        }
+        },
+
+        "storageSKU": {
+            "value": "Standard_GRS" 
+
     }
 }
+}
+
+
+
+
