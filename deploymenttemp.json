@@ -1,8 +1,12 @@
 {
+    // ARM JSON Template
+    
+    //Template api version
+    
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
 
-    //Add first Parameter for storage account name
+    // 1. Add first Parameter for storage account name
     "parameters":{
         "storageAccountName":{
             "type": "string",
@@ -15,7 +19,7 @@
         },
 
 
-    //Add second parameter for SKU type
+    // 2.  Add second parameter for SKU type
 
     "storageSKU": {
       "type": "string",
@@ -30,10 +34,18 @@
         "Standard_GZRS",
         "Standard_RAGZRS"
       ]
-    }
+    },
   
+    // 3. Add template FUNCTION 
+
+    "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+    }
+
+
 },
-    //Add AZ Resources ie...storage,VMs etc
+    //ADD RESOURCES ie...storage,VMs etc
 
     "resources": [
        {
@@ -43,7 +55,7 @@
            "tags": {
                "displayName": "prpstorage1"
            },
-           "location": "[resourceGroup().location]",
+           "location": "[parameters('location')]",
            "kind": "StorageV2",
            "sku": {
                "name": "[parameters('storageSKU')]",
