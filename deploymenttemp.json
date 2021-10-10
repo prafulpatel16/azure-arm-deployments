@@ -63,5 +63,13 @@
                "tier": "Standard"
            }
        }
-    ]
+    ],
+    // Add Outputs
+    "outputs": {
+        "storageEndpoints": {
+            "type": "object",
+            "value": "[reference(variables('uniqueStorageName')).primaryEndpoints]"
+        }
+    }
+     
   }
