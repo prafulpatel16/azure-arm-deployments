@@ -8,16 +8,12 @@
 
     // 1. Add first Parameter for storage account name
     "parameters":{
-        "storageAccountName":{
-            "type": "string",
-            "metadata":{
-                "description": "Storage Account Name"
-            },
-            "minLength": 3,
-            "maxLength": 24
+        "storagePrefix": {
+           "type": "string",
+           "minLength": 3,
+           "maxLength": 11  
 
         },
-
 
     // 2.  Add second parameter for SKU type
 
@@ -42,14 +38,19 @@
         "type": "string",
         "defaultValue": "[resourceGroup().location]"
     }
+    },
+    //4. Add Variables
+    "variables": {
+        "uniqueStorageName": "[concat(parameters('storagePrefix'), uniqueString(resourceGroup().id))]"
 
+    },
 
-},
+    
     //ADD RESOURCES ie...storage,VMs etc
 
     "resources": [
        {
-           "name": "[parameters('storageAccountName')]",
+           "name": "[variables('uniqueStorageName')]",
            "type": "Microsoft.Storage/storageAccounts",
            "apiVersion": "2021-04-01",
            "tags": {
