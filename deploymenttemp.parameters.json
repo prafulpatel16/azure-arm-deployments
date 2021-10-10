@@ -4,7 +4,7 @@
     "parameters": {
         
         "storagePrefix": {
-            "value": "praful" // TODO: Fill in parameter value
+            "value": "prp" // TODO: Fill in parameter value
         },
 
         "storageSKU": {
