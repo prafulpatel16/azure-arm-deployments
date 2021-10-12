@@ -1,0 +1,171 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "praful-windows-vmName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "praful-windows-vmAdminUserName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "praful-windows-vmAdminPassword": {
+            "type": "securestring"
+        },
+        "praful-windows-vmWindowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter",
+            "allowedValues": [
+                "2008-R2-SP1",
+                "2012-Datacenter",
+                "2012-R2-Datacenter",
+                "Windows-Server-Technical-Preview"
+            ]
+        },
+        "praful-storage-accType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_ZRS",
+                "Standard_GRS",
+                "Standard_RAGRS",
+                "Premium_LRS"
+            ]
+        }
+    },
+    "resources": [
+        {
+            "name": "praful-virtual-network",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "praful-virtual-network"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('praful-virtual-networkPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('praful-virtual-networkSubnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('praful-virtual-networkSubnet1Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('praful-virtual-networkSubnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('praful-virtual-networkSubnet2Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('praful-windows-vmNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', 'praful-virtual-network')]"
+            ],
+            "tags": {
+                "displayName": "praful-windows-vmNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('praful-windows-vmSubnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('praful-windows-vmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('praful-storage-accName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('praful-windows-vmNicName'))]"
+            ],
+            "tags": {
+                "displayName": "praful-windows-vm"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('praful-windows-vmVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('praful-windows-vmName')]",
+                    "adminUsername": "[parameters('praful-windows-vmAdminUsername')]",
+                    "adminPassword": "[parameters('praful-windows-vmAdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('praful-windows-vmImagePublisher')]",
+                        "offer": "[variables('praful-windows-vmImageOffer')]",
+                        "sku": "[parameters('praful-windows-vmWindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "praful-windows-vmOSDisk",
+                        "vhd": {
+                            "uri": "[concat('http://', variables('praful-storage-accName'), '.blob.core.windows.net/', variables('praful-windows-vmStorageAccountContainerName'), '/', variables('praful-windows-vmOSDiskName'), '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('praful-windows-vmNicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[variables('praful-storage-accName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "praful-storage-acc"
+            },
+            "properties": {
+                "accountType": "[parameters('praful-storage-accType')]"
+            }
+        }
+    ],
+    "variables": {
+        "praful-virtual-networkPrefix": "10.0.0.0/16",
+        "praful-virtual-networkSubnet1Name": "Subnet-1",
+        "praful-virtual-networkSubnet1Prefix": "10.0.0.0/24",
+        "praful-virtual-networkSubnet2Name": "Subnet-2",
+        "praful-virtual-networkSubnet2Prefix": "10.0.1.0/24",
+        "praful-windows-vmImagePublisher": "MicrosoftWindowsServer",
+        "praful-windows-vmImageOffer": "WindowsServer",
+        "praful-windows-vmOSDiskName": "praful-windows-vmOSDisk",
+        "praful-windows-vmVmSize": "Standard_B1s",
+        "praful-windows-vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'praful-virtual-network')]",
+        "praful-windows-vmSubnetRef": "[concat(variables('praful-windows-vmVnetID'), '/subnets/', variables('praful-virtual-networkSubnet1Name'))]",
+        "praful-windows-vmStorageAccountContainerName": "vhds",
+        "praful-windows-vmNicName": "[concat(parameters('praful-windows-vmName'), 'NetworkInterface')]",
+        "praful-storage-accName": "[concat('praful-storage-acc', uniqueString(resourceGroup().id))]"
+    }
+}
