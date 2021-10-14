@@ -14,11 +14,16 @@
     "variables": {},
     "resources": [
         {
-            "type": "Microsoft.Resources/resourceGroups",
+            "type": "Microsoft.Resources/deployments",
             "apiVersion": "2018-05-01",
             "location": "[parameters('rgLocation')]",
             "name": "[parameters('rgName')]",
-            "properties": {}
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    
+                }
+            }
         }
     ],
     "outputs": {}
